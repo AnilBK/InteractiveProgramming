@@ -9,6 +9,7 @@ var should_update = false
 
 onready var debug_line_parent = $StackDecomposeVbox/DebugLineStack
 onready var program_node : TextEdit = $Program
+const Parser = preload("Parser.gd")
 
 var font = DynamicFont.new()
 
@@ -41,13 +42,13 @@ func _ready():
 	live = $HBoxContainer/Live.pressed
 	$HBoxContainer/Generate.visible = not live
 		
-func _input(event):
+func _input(_event):
 	if Input.is_action_just_pressed("insert_mouse_position"):
 		var l_pos = local_pos(get_global_mouse_position())
 		var position_to_add = str(l_pos.x) + " " + str(l_pos.y) + " "
 		program_node.insert_text_at_cursor(position_to_add)
 
-func _process(delta):
+func _process(_delta):
 	var m_pos = get_global_mouse_position()
 	var l_pos = str(local_pos(m_pos))
 #	$HBoxContainer/Label.text = str(m_pos) + " local pos: " + l_pos
@@ -56,61 +57,6 @@ func _process(delta):
 	if live or should_update:
 		update()
 
-func _parse_circle(params) -> Dictionary:
-	#Line       =    circle	  	10 	20 	5
-	#params (4) =    funcname 	x  	y   radius	
-	var valid : bool = true
-	var x : float = 0.0
-	var y : float = 0.0
-	var rad : float = 0.0
-		
-	if params.size() != 4:
-		valid = false
-	else:
-		x = float(params[1])
-		y = float(params[2])
-		rad = float(params[3])
-				
-	return {"valid" : valid, "x" : x, "y" : y, "rad" : rad}
-	
-func _parse_rect(params) -> Dictionary:
-	#Line       =    rect	  	10 	20 	30	40
-	#params (5) =    funcname 	x	y	w	h	
-	var valid : bool = true
-	var x : float = 0.0
-	var y : float = 0.0
-	var w : float = 0.0
-	var h : float = 0.0
-		
-	if params.size() != 5:
-		valid = false
-	else:
-		x = float(params[1])
-		y = float(params[2])
-		w = float(params[3])
-		h = float(params[4])
-				
-	return {"valid" : valid, "x" : x, "y" : y, "w" : w, "h" : h}
-
-func _parse_line(params) -> Dictionary:
-	#Line       =    line	  	10 	20 	30	40
-	#params (5) =    funcname 	x1	y1	x2	y2	
-	var valid : bool = true
-	var x1 : float = 0.0
-	var y1 : float = 0.0
-	var x2 : float = 0.0
-	var y2 : float = 0.0
-		
-	if params.size() != 5:
-		valid = false
-	else:
-		x1 = float(params[1])
-		y1 = float(params[2])
-		x2 = float(params[3])
-		y2 = float(params[4])
-				
-	return {"valid" : valid, "x1" : x1, "y1" : y1, "x2" : x2, "y2" : y2}
-	
 func _draw():
 	var c = 0
 	var current_line = current_line()
@@ -120,7 +66,7 @@ func _draw():
 		var func_name = params[0]
 		
 		if func_name == "circle":
-			var parsed_circle = _parse_circle(params)
+			var parsed_circle = Parser._parse_circle(params)
 			if parsed_circle.valid:
 				var _x = parsed_circle.x
 				var _y = parsed_circle.y
@@ -132,7 +78,7 @@ func _draw():
 				if c == current_line:
 					$StackDecomposeVbox/Label.text = "Circle: \n" + "x : " + str(_x) + "\n" + "y : " + str(_y) + "\n" + "radius : " + str(_rad)
 		elif func_name == "rect":
-			var parsed_rect = _parse_rect(params)
+			var parsed_rect = Parser._parse_rect(params)
 			if parsed_rect.valid:
 				var _x = parsed_rect.x
 				var _y = parsed_rect.y 
@@ -145,7 +91,7 @@ func _draw():
 				var color = Color.blue
 				draw_rect(Rect2(pos, size), color)
 		elif func_name == "line":
-			var parsed_line = _parse_line(params)
+			var parsed_line = Parser._parse_line(params)
 			if parsed_line.valid:
 				var _x1 = parsed_line.x1
 				var _y1 = parsed_line.y1
@@ -158,19 +104,14 @@ func _draw():
 				var color = Color.green
 				draw_line(line_start_pos, line_end_pos, color)
 		elif func_name == "text":
-			if params.size() >= 3:
-				var _x = float(params[1])
-				var _y = float(params[2])
+			var parsed_text = Parser._parse_text(line)
+			if parsed_text.valid:
+				var _x = parsed_text.x1
+				var _y = parsed_text.y1 
+				var _string = parsed_text.string
+
 				var pos = global_pos(Vector2(_x, _y))
-				
-				#Make sure we have two " " to properly get the string.
-				var quotes_count = line.count("\"")
-				
-				var _string = ""
-				if params.size() > 3 and quotes_count == 2:
-					#We need to get the string.
-					_string = line.get_slice("\"", 1)
-				
+				print(_string)
 				draw_string(font, pos, _string)		
 			
 		c += 1		
@@ -295,7 +236,7 @@ func add_debug_circle_hbox(x, y, rad):
 	y_spinbox.connect("value_changed", self, "update_y")
 	radius_spinbox.connect("value_changed", self, "update_radius")
 
-func add_debug_line_hbox(x1, y1, x2, y2):
+func add_debug_line_hbox(x1, y1, _x2, _y2):
 	# Add all these buttons that manipulate the lines.
 	var x_label = Label.new()
 	x_label.text = "X : " 
@@ -350,18 +291,11 @@ func _on_DebugLine_pressed():
 		var func_name = params[0]
 		
 		if func_name == "circle":
-			var parsed_circle  = _parse_circle(params)
-			if parsed_circle.valid:
-				var _x = parsed_circle.x
-				var _y = parsed_circle.y
-				var _rad = parsed_circle.rad
-				add_debug_circle_hbox(_x, _y, _rad)
+			var circle = Parser._parse_circle(params)
+			if circle.valid:
+				add_debug_circle_hbox(circle.x, circle.y, circle.rad)
 		elif func_name == "line":
-			var parsed_line = _parse_line(params)
-			if parsed_line.valid:
-				var _x1 = parsed_line.x1
-				var _y1 = parsed_line.y1
-				var _x2 = parsed_line.x2
-				var _y2 = parsed_line.y2
-				add_debug_line_hbox(_x1, _y1, _x2, _y2)
+			var _line = Parser._parse_line(params)
+			if  _line.valid:
+				add_debug_line_hbox(_line.x1, _line.y1, _line.x2, _line.y2)
 		break		
