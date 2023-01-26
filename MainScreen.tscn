@@ -1,0 +1,125 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://MainScreen.gd" type="Script" id=1]
+[ext_resource path="res://Stack.gd" type="Script" id=2]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_right = 204.0
+margin_bottom = 24.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Label" type="Label" parent="VBoxContainer/HBoxContainer"]
+margin_top = 5.0
+margin_right = 73.0
+margin_bottom = 19.0
+text = "Enter Code:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LineEdit" type="LineEdit" parent="VBoxContainer/HBoxContainer"]
+margin_left = 77.0
+margin_right = 135.0
+margin_bottom = 24.0
+expand_to_text_length = true
+
+[node name="Compile" type="Button" parent="VBoxContainer/HBoxContainer"]
+margin_left = 139.0
+margin_right = 204.0
+margin_bottom = 24.0
+text = "Compile"
+
+[node name="Stack" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 28.0
+margin_right = 204.0
+margin_bottom = 42.0
+script = ExtResource( 2 )
+
+[node name="Label" type="Label" parent="VBoxContainer/Stack"]
+margin_right = 64.0
+margin_bottom = 14.0
+text = "The Stack:"
+
+[node name="RichTextLabel" type="RichTextLabel" parent="VBoxContainer/Stack"]
+margin_left = 68.0
+margin_right = 68.0
+margin_bottom = 14.0
+
+[node name="Equations" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 46.0
+margin_right = 204.0
+margin_bottom = 106.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/Equations"]
+margin_right = 175.0
+margin_bottom = 60.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Equations/VBoxContainer"]
+margin_right = 175.0
+margin_bottom = 14.0
+
+[node name="Label" type="Label" parent="VBoxContainer/Equations/VBoxContainer/HBoxContainer"]
+margin_right = 43.0
+margin_bottom = 14.0
+text = "2X + Y:"
+
+[node name="ResultLabel" type="Label" parent="VBoxContainer/Equations/VBoxContainer/HBoxContainer"]
+margin_left = 47.0
+margin_right = 47.0
+margin_bottom = 14.0
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/Equations/VBoxContainer"]
+margin_top = 18.0
+margin_right = 175.0
+margin_bottom = 42.0
+
+[node name="Label2" type="Label" parent="VBoxContainer/Equations/VBoxContainer/HBoxContainer2"]
+margin_top = 5.0
+margin_right = 8.0
+margin_bottom = 19.0
+text = "X"
+
+[node name="X" type="SpinBox" parent="VBoxContainer/Equations/VBoxContainer/HBoxContainer2"]
+margin_left = 12.0
+margin_right = 86.0
+margin_bottom = 24.0
+
+[node name="Label3" type="Label" parent="VBoxContainer/Equations/VBoxContainer/HBoxContainer2"]
+margin_left = 90.0
+margin_top = 5.0
+margin_right = 97.0
+margin_bottom = 19.0
+text = "Y"
+
+[node name="Y" type="SpinBox" parent="VBoxContainer/Equations/VBoxContainer/HBoxContainer2"]
+margin_left = 101.0
+margin_right = 175.0
+margin_bottom = 24.0
+
+[node name="EqnDecompose" type="HBoxContainer" parent="VBoxContainer/Equations/VBoxContainer"]
+margin_top = 46.0
+margin_right = 175.0
+margin_bottom = 60.0
+
+[node name="Label" type="Label" parent="VBoxContainer/Equations/VBoxContainer/EqnDecompose"]
+margin_bottom = 14.0
+
+[connection signal="value_changed" from="VBoxContainer/Equations/VBoxContainer/HBoxContainer2/X" to="VBoxContainer/Stack" method="_on_X_value_changed"]
+[connection signal="value_changed" from="VBoxContainer/Equations/VBoxContainer/HBoxContainer2/Y" to="VBoxContainer/Stack" method="_on_Y_value_changed"]

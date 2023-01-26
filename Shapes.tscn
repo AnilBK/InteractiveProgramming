@@ -1,0 +1,73 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Shapes.gd" type="Script" id=1]
+
+[node name="Shapes" type="Control"]
+script = ExtResource( 1 )
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_right = 94.0
+margin_bottom = 40.0
+
+[node name="Generate" type="Button" parent="HBoxContainer"]
+margin_right = 71.0
+margin_bottom = 40.0
+text = "Generate"
+
+[node name="Live" type="CheckButton" parent="HBoxContainer"]
+margin_left = 75.0
+margin_right = 181.0
+margin_bottom = 40.0
+pressed = true
+text = "Live"
+
+[node name="Label" type="Label" parent="HBoxContainer"]
+margin_left = 185.0
+margin_top = 13.0
+margin_right = 279.0
+margin_bottom = 27.0
+text = "Enter Program:"
+
+[node name="Program" type="TextEdit" parent="."]
+margin_top = 49.0
+margin_right = 455.0
+margin_bottom = 458.0
+text = "circle 10 20 3
+"
+
+[node name="StackDecomposeVbox" type="VBoxContainer" parent="."]
+margin_top = 477.0
+margin_right = 40.0
+margin_bottom = 517.0
+
+[node name="HBoxContainer" type="HBoxContainer" parent="StackDecomposeVbox"]
+margin_right = 84.0
+margin_bottom = 20.0
+
+[node name="TitleLabel" type="Label" parent="StackDecomposeVbox/HBoxContainer"]
+visible = false
+margin_top = 3.0
+margin_right = 37.0
+margin_bottom = 17.0
+text = "Stack:"
+
+[node name="DebugLine" type="Button" parent="StackDecomposeVbox/HBoxContainer"]
+margin_right = 84.0
+margin_bottom = 20.0
+text = "Debug Line"
+
+[node name="DebugLineStack" type="VBoxContainer" parent="StackDecomposeVbox"]
+margin_top = 24.0
+margin_right = 84.0
+margin_bottom = 24.0
+
+[node name="Label" type="Label" parent="StackDecomposeVbox"]
+visible = false
+margin_top = 28.0
+margin_right = 125.0
+margin_bottom = 42.0
+
+[connection signal="pressed" from="HBoxContainer/Generate" to="." method="_on_Generate_pressed"]
+[connection signal="toggled" from="HBoxContainer/Live" to="." method="_on_Live_toggled"]
+[connection signal="text_changed" from="Program" to="." method="_on_Program_text_changed"]
+[connection signal="pressed" from="StackDecomposeVbox/HBoxContainer/DebugLine" to="." method="_on_DebugLine_pressed"]
