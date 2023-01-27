@@ -228,40 +228,105 @@ func add_debug_circle_hbox(x, y, rad):
 	y_spinbox.connect("value_changed", self, "update_y")
 	radius_spinbox.connect("value_changed", self, "update_radius")
 
-func add_debug_line_hbox(x1, y1, _x2, _y2):
-	# Add all these buttons that manipulate the lines.
-	var x_label = Label.new()
-	x_label.text = "X : " 
-	var x_spinbox = SpinBox.new()
-	x_spinbox.allow_greater = true
-	x_spinbox.allow_lesser = true
-	x_spinbox.min_value = -INF
-	x_spinbox.max_value = INF
-	x_spinbox.value = x1
+func update_line(new_value, item_name):
+	# get the first line directly.
+	var line = code[current_line()]
+	#Line  =     line	  	10 	20 	50	60
+	#params =    funcname 	x1 	y1  x2	y2	
+	var params = get_parameters(line)
 
-	var y_label = Label.new()
-	y_label.text = "Y : " 
-	var y_spinbox = SpinBox.new()
-	y_spinbox.allow_greater = true
-	y_spinbox.allow_lesser = true
-	y_spinbox.min_value = -INF
-	y_spinbox.max_value = INF
-	y_spinbox.value = y1
-
+	if params.size() < 5:
+		return
 	
+	var func_name = params[0]
+	var x1 = params[1]
+	var y1 = params[2]
+	var x2 = params[3]
+	var y2 = params[4]
+
+	if func_name != "line":
+		return	
+
+	if item_name == "x1":
+		x1 = new_value
+	elif item_name == "y1":
+		y1 = new_value
+	elif item_name == "x2":
+		x2 = new_value
+	elif item_name == "y2":
+		y2 = new_value
+
+	var modified_line = func_name + " " + str(x1) + " " + str(y1)+ " " + str(x2) + " " + str(y2)
+	update_initial_code(current_line(), modified_line)	
+
+func update_x1(new_value):
+	update_line(new_value, "x1")
+
+func update_y1(new_value):
+	update_line(new_value, "y1")
+
+func update_x2(new_value):
+	update_line(new_value, "x2")
+
+func update_y2(new_value):
+	update_line(new_value, "y2")
+	
+func add_debug_line_hbox(x1, y1, x2, y2):
+	# Add all these buttons that manipulate the lines.
+	var x1_label = Label.new()
+	x1_label.text = "X1 : " 
+	var x1_spinbox = SpinBox.new()
+	x1_spinbox.allow_greater = true
+	x1_spinbox.allow_lesser = true
+	x1_spinbox.min_value = -INF
+	x1_spinbox.max_value = INF
+	x1_spinbox.value = x1
+
+	var y1_label = Label.new()
+	y1_label.text = "Y1 : " 
+	var y1_spinbox = SpinBox.new()
+	y1_spinbox.allow_greater = true
+	y1_spinbox.allow_lesser = true
+	y1_spinbox.min_value = -INF
+	y1_spinbox.max_value = INF
+	y1_spinbox.value = y1
+
+	var x2_label = Label.new()
+	x2_label.text = "X2 : " 
+	var x2_spinbox = SpinBox.new()
+	x2_spinbox.allow_greater = true
+	x2_spinbox.allow_lesser = true
+	x2_spinbox.min_value = -INF
+	x2_spinbox.max_value = INF
+	x2_spinbox.value = x2
+
+	var y2_label = Label.new()
+	y2_label.text = "Y2 : " 
+	var y2_spinbox = SpinBox.new()
+	y2_spinbox.allow_greater = true
+	y2_spinbox.allow_lesser = true
+	y2_spinbox.min_value = -INF
+	y2_spinbox.max_value = INF
+	y2_spinbox.value = y2
+
 	############################################
 	############################################
 					
 	var ValueHBox = HBoxContainer.new()
-	ValueHBox.add_child(x_label)
-	ValueHBox.add_child(x_spinbox)
-	ValueHBox.add_child(y_label)
-	ValueHBox.add_child(y_spinbox)
+	ValueHBox.add_child(x1_label)
+	ValueHBox.add_child(x1_spinbox)
+	ValueHBox.add_child(y1_label)
+	ValueHBox.add_child(y1_spinbox)
+	ValueHBox.add_child(x2_label)
+	ValueHBox.add_child(x2_spinbox)
+	ValueHBox.add_child(y2_label)
+	ValueHBox.add_child(y2_spinbox)
 	debug_line_parent.add_child(ValueHBox)
 					
-#	x_spinbox.connect("value_changed", self, "update_x")
-#	y_spinbox.connect("value_changed", self, "update_y")
-#	radius_spinbox.connect("value_changed", self, "update_radius")
+	x1_spinbox.connect("value_changed", self, "update_x1")
+	y1_spinbox.connect("value_changed", self, "update_y1")
+	x2_spinbox.connect("value_changed", self, "update_x2")
+	y2_spinbox.connect("value_changed", self, "update_y2")
 	
 func delete_children(node):
 	var children = node.get_children()
