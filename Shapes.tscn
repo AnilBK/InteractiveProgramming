@@ -61,12 +61,6 @@ margin_top = 24.0
 margin_right = 84.0
 margin_bottom = 24.0
 
-[node name="Label" type="Label" parent="StackDecomposeVbox"]
-visible = false
-margin_top = 28.0
-margin_right = 125.0
-margin_bottom = 42.0
-
 [connection signal="pressed" from="HBoxContainer/Generate" to="." method="_on_Generate_pressed"]
 [connection signal="toggled" from="HBoxContainer/Live" to="." method="_on_Live_toggled"]
 [connection signal="text_changed" from="Program" to="." method="_on_Program_text_changed"]

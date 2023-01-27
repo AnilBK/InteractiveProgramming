@@ -58,8 +58,6 @@ func _process(_delta):
 		update()
 
 func _draw():
-	var c = 0
-	var current_line = current_line()
 	for line in code:
 #		print(c)
 		var params = line.split(" ") 
@@ -74,9 +72,6 @@ func _draw():
 			
 				var pos = global_pos(Vector2(_x, _y))
 				draw_circle(pos, _rad, Color.red)
-				
-				if c == current_line:
-					$StackDecomposeVbox/Label.text = "Circle: \n" + "x : " + str(_x) + "\n" + "y : " + str(_y) + "\n" + "radius : " + str(_rad)
 		elif func_name == "rect":
 			var parsed_rect = Parser._parse_rect(params)
 			if parsed_rect.valid:
@@ -114,7 +109,6 @@ func _draw():
 				print(_string)
 				draw_string(font, pos, _string)		
 			
-		c += 1		
 		
 	#Draw Grid and Gizmos.
 	draw_circle(start_pos, 2, Color.red)
