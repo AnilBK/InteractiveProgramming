@@ -57,28 +57,33 @@ static func _parse_line(params) -> Dictionary:
 	return {"valid" : valid, "x1" : x1, "y1" : y1, "x2" : x2, "y2" : y2}
 		
 static func _parse_text(line : String) -> Dictionary:
-	var params = line.split(" ") 
 	#Line         =    text	  	10 	20 	" Some String "
-	#params (>=5) =   funcname 	x1	y1	" string      "	
+	#params       =   funcname 	x1	y1	" string      "	
 	var valid : bool = true
 	var x1 : float = 0.0
 	var y1 : float = 0.0
 	var string : String = ""
 
-	if !(params.size() >= 5):
-		valid = false
-	else:
-		x1 = float(params[1])
-		y1 = float(params[2])
+	#Make sure we have just two quotes.
+	var quotes_count = line.count("\"")
+	if quotes_count == 2:
+		var pos_of_first_quote = line.find("\"")
+		#text	  	10 	20 	" Some String "
+		#                   ^ pos_of_first_quote 
+		#1 			2	3 = 3 parameters on the left.
+		var left_string = line.left(pos_of_first_quote)
+		left_string = left_string.rstrip(" ")
 
-		#Make sure we have two " " to properly get the string.
-		var quotes_count = line.count("\"")
-		
-		if quotes_count == 2:
-			#We need to get the string.
-			#Let's hope the fourth and last element is quote.
+		var left_params = left_string.split(" ")
+		if left_params.size() == 3:
+			x1 = float(left_params[1])
+			y1 = float(left_params[2])
 			string = line.get_slice("\"", 1)
-				
+		else:	
+			valid = false
+	else:
+		valid = false
+
 	return {"valid" : valid, "x1" : x1, "y1" : y1, "string" : string}
 		
 	
