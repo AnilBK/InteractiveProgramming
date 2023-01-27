@@ -106,7 +106,6 @@ func _draw():
 				var _string = parsed_text.string
 
 				var pos = global_pos(Vector2(_x, _y))
-				print(_string)
 				draw_string(font, pos, _string)		
 			
 		
