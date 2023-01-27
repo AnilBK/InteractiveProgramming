@@ -60,7 +60,7 @@ func _process(_delta):
 func _draw():
 	for line in code:
 #		print(c)
-		var params = line.split(" ") 
+		var params = get_parameters(line)
 		var func_name = params[0]
 		
 		if func_name == "circle":
@@ -136,7 +136,7 @@ func update_initial_code(line_no, new_text):
 	$Program.update()		
 
 func get_parameters(line):
-	var params = line.split(" ")
+	var params = line.rstrip(" ").split(" ")
 	return params
 
 func update_circle(new_value, item_name):
@@ -337,7 +337,7 @@ func _on_DebugLine_pressed():
 			c += 1
 			continue
 			
-		var params = line.split(" ") 
+		var params = get_parameters(line)
 		var func_name = params[0]
 		
 		if func_name == "circle":
