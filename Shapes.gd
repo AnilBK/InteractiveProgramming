@@ -142,7 +142,7 @@ func update_initial_code(line_no, new_text):
 	$Program.set_line(line_no, new_text)
 	$Program.update()		
 
-func get_parameters_of_circle(line):
+func get_parameters(line):
 	var params = line.split(" ")
 	return params
 
@@ -151,7 +151,7 @@ func update_circle(new_value, item_name):
 	var line = code[current_line()]
 	#Line  =     circle	  	10 	20 	5
 	#params =    funcname 	x  	y   radius	
-	var params = get_parameters_of_circle(line)
+	var params = get_parameters(line)
 
 	if params.size() < 4:
 		return
