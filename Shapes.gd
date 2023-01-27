@@ -146,50 +146,42 @@ func get_parameters_of_circle(line):
 	var params = line.split(" ")
 	return params
 
-func update_x(new_value):
+func update_circle(new_value, item_name):
 	# get the first line directly.
 	var line = code[current_line()]
 	#Line  =     circle	  	10 	20 	5
 	#params =    funcname 	x  	y   radius	
 	var params = get_parameters_of_circle(line)
+
+	if params.size() < 4:
+		return
 	
 	var func_name = params[0]
-	var x = new_value #float(params[1])
-	var y = float(params[2])
-	var rad = float(params[3])
-	
+	var x = params[1]
+	var y = params[2]
+	var rad = params[3]
+
+	if func_name != "circle":
+		return	
+
+	if item_name == "x":
+		x = new_value
+	elif item_name == "y":
+		y = new_value
+	elif item_name == "rad":
+		rad = new_value
+
 	var modified_line = func_name + " " + str(x) + " " + str(y)+ " " + str(rad)
-	update_initial_code(current_line(), modified_line)
+	update_initial_code(current_line(), modified_line)	
+
+func update_x(new_value):
+	update_circle(new_value, "x")
 	
 func update_y(new_value):
-	# get the first line directly.
-	var line = code[current_line()]
-	#Line  =     circle	  	10 	20 	5
-	#params =    funcname 	x  	y   radius	
-	var params = get_parameters_of_circle(line)
-	
-	var func_name = params[0]
-	var x = float(params[1])
-	var y = new_value #float(params[2])
-	var rad = float(params[3])
-	
-	var modified_line = func_name + " " + str(x) + " " + str(y)+ " " + str(rad)
-	update_initial_code(current_line(), modified_line)
+	update_circle(new_value, "y")
 
 func update_radius(new_value):
-	# get the first line directly.
-	var line = code[current_line()]
-	#Line  =     circle	  	10 	20 	5
-	#params =    funcname 	x  	y   radius	
-	var params = get_parameters_of_circle(line)
-	
-	var func_name = params[0]
-	var x = float(params[1])
-	var y = float(params[2])
-	var rad = new_value #float(params[3])
-	
-	var modified_line = func_name + " " + str(x) + " " + str(y)+ " " + str(rad)
-	update_initial_code(current_line(), modified_line)
+	update_circle(new_value, "rad")
 	
 func add_debug_circle_hbox(x, y, rad):
 	# Add all these buttons that manipulate the lines.
