@@ -45,16 +45,21 @@ static func _parse_line(params) -> Dictionary:
 	var y1 : float = 0.0
 	var x2 : float = 0.0
 	var y2 : float = 0.0
+	var w : float = 1.0 #Optional
 		
-	if params.size() != 5:
+	#w is an additional param, so we check sizes 5 and 6.	
+	if not (params.size() == 5 or params.size() == 6):
 		valid = false
 	else:
 		x1 = float(params[1])
 		y1 = float(params[2])
 		x2 = float(params[3])
 		y2 = float(params[4])
+
+		if params.size() == 6:
+			w = float(params[5])
 				
-	return {"valid" : valid, "x1" : x1, "y1" : y1, "x2" : x2, "y2" : y2}
+	return {"valid" : valid, "x1" : x1, "y1" : y1, "x2" : x2, "y2" : y2, "w" : w}
 		
 static func _parse_text(line : String) -> Dictionary:
 	#Line         =    text	  	10 	20 	" Some String "

@@ -92,12 +92,25 @@ func _draw():
 				var _y1 = parsed_line.y1
 				var _x2 = parsed_line.x2
 				var _y2 = parsed_line.y2
+				var _w = parsed_line.w
 				
 				var line_start_pos = global_pos(Vector2(_x1, _y1))
 				var line_end_pos = global_pos(Vector2(_x2, _y2))
 				
 				var color = Color.green
-				draw_line(line_start_pos, line_end_pos, color)
+
+				"""
+				if _w == 1.0f:
+					#We have some width.
+					draw_line(line_start_pos, line_end_pos, color)
+				else:
+					draw_line(line_star
+					draw_line(line_start_pos, line_end_pos, color, _w)
+				"""		
+				#We can do the thing above but remove the extra if i guess.
+				draw_line(line_start_pos, line_end_pos, color, _w)
+
+
 		elif func_name == "text":
 			var parsed_text = Parser._parse_text(line)
 			if parsed_text.valid:
@@ -347,5 +360,5 @@ func _on_DebugLine_pressed():
 		elif func_name == "line":
 			var _line = Parser._parse_line(params)
 			if  _line.valid:
-				add_debug_line_hbox(_line.x1, _line.y1, _line.x2, _line.y2)
+				add_debug_line_hbox(_line.x1, _line.y1, _line.x2, _line.y2)#, _line.w)
 		break		
