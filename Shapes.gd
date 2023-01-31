@@ -13,6 +13,22 @@ const Parser = preload("Parser.gd")
 
 var font = DynamicFont.new()
 
+var built_in_types = [
+{
+	"name" : "circle",
+	"x" : 1,
+	"y" : 2,
+	"rad" : 3
+},
+{
+	"name" : "line",
+	"x1" : 1,
+	"y1" : 2,
+	"x2" : 3,
+	"y2" : 4
+}
+]
+
 var code = [
 	"circle 10 20 5"
 ]
@@ -35,6 +51,12 @@ func process_code():
 	for line in lines:
 		code.append(line)
 		#print(line)
+
+func replace_nth_word(string : String, index, new_value):
+	var strings_splitted = string.split(" ")
+	strings_splitted[index] = str(new_value)
+	var final_str = String(" ").join(strings_splitted)
+	return final_str
 	
 func _ready():
 	font.font_data = load("res://Alaska.ttf")
@@ -126,7 +148,7 @@ func _draw():
 	draw_circle(start_pos, 2, Color.red)
 	draw_line(start_pos, Vector2(OS.get_window_size().x, start_pos.y), Color.red)
 	draw_line(start_pos, Vector2(start_pos.x, OS.get_window_size().y), Color.green)
-		
+
 	should_update = false		
 
 func _on_Generate_pressed():
@@ -152,42 +174,36 @@ func get_parameters(line):
 	var params = line.rstrip(" ").split(" ")
 	return params
 
-func update_circle(new_value, item_name):
-	# get the first line directly.
+func update_param(param_to_modify, new_value):
+	#As of now, we directly access the current line,
+	#so we don't need to pass the line no.
 	var line = code[current_line()]
 	#Line  =     circle	  	10 	20 	5
 	#params =    funcname 	x  	y   radius	
 	var params = get_parameters(line)
 
-	if params.size() < 4:
-		return
-	
 	var func_name = params[0]
-	var x = params[1]
-	var y = params[2]
-	var rad = params[3]
 
-	if func_name != "circle":
-		return	
-
-	if item_name == "x":
-		x = new_value
-	elif item_name == "y":
-		y = new_value
-	elif item_name == "rad":
-		rad = new_value
-
-	var modified_line = func_name + " " + str(x) + " " + str(y)+ " " + str(rad)
-	update_initial_code(current_line(), modified_line)	
+	for shape in built_in_types:
+		if func_name == shape.name:
+			if params.size() == shape.size():
+				if param_to_modify in shape.keys():	
+					# circle x y rad
+					#	"x" : 1 -> From built_in_types.
+					# Means we have to replace the 1th word after a space, whenever we have to modify the "x" value.
+					var index = shape.get(param_to_modify)
+					var modified_line = replace_nth_word(line, index, new_value)
+					update_initial_code(current_line(), modified_line)
+					return
 
 func update_x(new_value):
-	update_circle(new_value, "x")
+	update_param("x", new_value)
 	
 func update_y(new_value):
-	update_circle(new_value, "y")
+	update_param("y", new_value)
 
 func update_radius(new_value):
-	update_circle(new_value, "rad")
+	update_param("rad", new_value)
 	
 func add_debug_circle_hbox(x, y, rad):
 	# Add all these buttons that manipulate the lines.
@@ -234,49 +250,18 @@ func add_debug_circle_hbox(x, y, rad):
 	y_spinbox.connect("value_changed", self, "update_y")
 	radius_spinbox.connect("value_changed", self, "update_radius")
 
-func update_line(new_value, item_name):
-	# get the first line directly.
-	var line = code[current_line()]
-	#Line  =     line	  	10 	20 	50	60
-	#params =    funcname 	x1 	y1  x2	y2	
-	var params = get_parameters(line)
-
-	if params.size() < 5:
-		return
-	
-	var func_name = params[0]
-	var x1 = params[1]
-	var y1 = params[2]
-	var x2 = params[3]
-	var y2 = params[4]
-
-	if func_name != "line":
-		return	
-
-	if item_name == "x1":
-		x1 = new_value
-	elif item_name == "y1":
-		y1 = new_value
-	elif item_name == "x2":
-		x2 = new_value
-	elif item_name == "y2":
-		y2 = new_value
-
-	var modified_line = func_name + " " + str(x1) + " " + str(y1)+ " " + str(x2) + " " + str(y2)
-	update_initial_code(current_line(), modified_line)	
-
 func update_x1(new_value):
-	update_line(new_value, "x1")
+	update_param("x1", new_value)
 
 func update_y1(new_value):
-	update_line(new_value, "y1")
+	update_param("y1", new_value)
 
 func update_x2(new_value):
-	update_line(new_value, "x2")
+	update_param("x2", new_value)
 
 func update_y2(new_value):
-	update_line(new_value, "y2")
-	
+	update_param("y2", new_value)
+
 func add_debug_line_hbox(x1, y1, x2, y2):
 	# Add all these buttons that manipulate the lines.
 	var x1_label = Label.new()
