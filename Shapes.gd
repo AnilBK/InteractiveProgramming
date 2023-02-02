@@ -203,13 +203,17 @@ func update_param(param_to_modify, new_value):
 					update_initial_code(current_line(), modified_line)
 					return
 
-func update_x(new_value):
+##############################################################
+##############################################################
+##############################################################
+
+func circle_update_x(new_value):
 	update_param("x", new_value)
 	
-func update_y(new_value):
+func circle_update_y(new_value):
 	update_param("y", new_value)
 
-func update_radius(new_value):
+func circle_update_radius(new_value):
 	update_param("rad", new_value)
 	
 func add_debug_circle_hbox(x, y, rad):
@@ -253,9 +257,9 @@ func add_debug_circle_hbox(x, y, rad):
 	ValueHBox.add_child(radius_spinbox)
 	debug_line_parent.add_child(ValueHBox)
 					
-	x_spinbox.connect("value_changed", self, "update_x")
-	y_spinbox.connect("value_changed", self, "update_y")
-	radius_spinbox.connect("value_changed", self, "update_radius")
+	x_spinbox.connect("value_changed", self, "circle_update_x")
+	y_spinbox.connect("value_changed", self, "circle_update_y")
+	radius_spinbox.connect("value_changed", self, "circle_update_radius")
 
 ##############################################################
 ##############################################################
@@ -334,16 +338,16 @@ func add_debug_rect_hbox(x, y, w, h):
 ##############################################################
 ##############################################################
 
-func update_x1(new_value):
+func line_update_x1(new_value):
 	update_param("x1", new_value)
 
-func update_y1(new_value):
+func line_update_y1(new_value):
 	update_param("y1", new_value)
 
-func update_x2(new_value):
+func line_update_x2(new_value):
 	update_param("x2", new_value)
 
-func update_y2(new_value):
+func line_update_y2(new_value):
 	update_param("y2", new_value)
 
 func add_debug_line_hbox(x1, y1, x2, y2):
@@ -398,11 +402,15 @@ func add_debug_line_hbox(x1, y1, x2, y2):
 	ValueHBox.add_child(y2_spinbox)
 	debug_line_parent.add_child(ValueHBox)
 					
-	x1_spinbox.connect("value_changed", self, "update_x1")
-	y1_spinbox.connect("value_changed", self, "update_y1")
-	x2_spinbox.connect("value_changed", self, "update_x2")
-	y2_spinbox.connect("value_changed", self, "update_y2")
-	
+	x1_spinbox.connect("value_changed", self, "line_update_x1")
+	y1_spinbox.connect("value_changed", self, "line_update_y1")
+	x2_spinbox.connect("value_changed", self, "line_update_x2")
+	y2_spinbox.connect("value_changed", self, "line_update_y2")
+
+##############################################################
+##############################################################
+##############################################################
+
 func delete_children(node):
 	var children = node.get_children()
 	for child in children:

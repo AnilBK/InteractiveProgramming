@@ -37,6 +37,7 @@ static func _parse_rect(params) -> Dictionary:
 				
 	return {"valid" : valid, "x" : x, "y" : y, "w" : w, "h" : h}
 
+
 static func _parse_line(params) -> Dictionary:
 	#Line       =    line	  	10 	20 	30	40
 	#params (5) =    funcname 	x1	y1	x2	y2	
@@ -60,6 +61,7 @@ static func _parse_line(params) -> Dictionary:
 			w = float(params[5])
 				
 	return {"valid" : valid, "x1" : x1, "y1" : y1, "x2" : x2, "y2" : y2, "w" : w}
+
 		
 static func _parse_text(line : String) -> Dictionary:
 	#Line         =    text	  	10 	20 	" Some String "
