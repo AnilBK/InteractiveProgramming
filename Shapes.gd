@@ -143,8 +143,8 @@ func _draw():
 		elif func_name == "text":
 			var parsed_text = Parser._parse_text(line)
 			if parsed_text.valid:
-				var _x = parsed_text.x1
-				var _y = parsed_text.y1 
+				var _x = parsed_text.x
+				var _y = parsed_text.y 
 				var _string = parsed_text.string
 
 				var pos = global_pos(Vector2(_x, _y))

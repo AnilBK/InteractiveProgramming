@@ -67,8 +67,8 @@ static func _parse_text(line : String) -> Dictionary:
 	#Line         =    text	  	10 	20 	" Some String "
 	#params       =   funcname 	x1	y1	" string      "	
 	var valid : bool = true
-	var x1 : float = 0.0
-	var y1 : float = 0.0
+	var x : float = 0.0
+	var y : float = 0.0
 	var string : String = ""
 
 	#Make sure we have just two quotes.
@@ -83,14 +83,14 @@ static func _parse_text(line : String) -> Dictionary:
 
 		var left_params = left_string.split(" ")
 		if left_params.size() == 3:
-			x1 = float(left_params[1])
-			y1 = float(left_params[2])
+			x = float(left_params[1])
+			y = float(left_params[2])
 			string = line.get_slice("\"", 1)
 		else:	
 			valid = false
 	else:
 		valid = false
 
-	return {"valid" : valid, "x1" : x1, "y1" : y1, "string" : string}
+	return {"valid" : valid, "x" : x, "y" : y, "string" : string}
 		
 	
