@@ -193,7 +193,7 @@ func update_param(param_to_modify, new_value):
 
 	for shape in built_in_types:
 		if func_name == shape.name:
-			if params.size() == shape.size():
+			if true or params.size() == shape.size():#Maybe not this check required ??
 				if param_to_modify in shape.keys():	
 					# circle x y rad
 					#	"x" : 1 -> From built_in_types.
