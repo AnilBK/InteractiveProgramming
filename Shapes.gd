@@ -70,6 +70,8 @@ func _ready():
 	font.size = 28
 	live = $HBoxContainer/Live.pressed
 	$HBoxContainer/Generate.visible = not live
+	
+	_on_Program_text_changed()
 		
 func _input(_event):
 	if Input.is_action_just_pressed("insert_mouse_position"):
