@@ -33,6 +33,11 @@ var built_in_types = [
 	"y1" : 2,
 	"x2" : 3,
 	"y2" : 4
+},
+{
+	"name" : "text",
+	"x" : 1,
+	"y" : 2
 }
 ]
 
@@ -461,6 +466,49 @@ func add_debug_line_hbox(x1, y1, x2, y2):
 ##############################################################
 ##############################################################
 
+func text_update_x(new_value):
+	update_param("x", new_value)
+	
+func text_update_y(new_value):
+	update_param("y", new_value)
+
+func add_debug_text_hbox(x, y):
+	# Add all these buttons that manipulate the lines.
+	var x_label = Label.new()
+	x_label.text = "X : " 
+	var x_spinbox = SpinBox.new()
+	x_spinbox.allow_greater = true
+	x_spinbox.allow_lesser = true
+	x_spinbox.min_value = -INF
+	x_spinbox.max_value = INF
+	x_spinbox.value = x
+
+	var y_label = Label.new()
+	y_label.text = "Y : " 
+	var y_spinbox = SpinBox.new()
+	y_spinbox.allow_greater = true
+	y_spinbox.allow_lesser = true
+	y_spinbox.min_value = -INF
+	y_spinbox.max_value = INF
+	y_spinbox.value = y
+
+	############################################
+	############################################
+					
+	var ValueHBox = HBoxContainer.new()
+	ValueHBox.add_child(x_label)
+	ValueHBox.add_child(x_spinbox)
+	ValueHBox.add_child(y_label)
+	ValueHBox.add_child(y_spinbox)
+	debug_line_parent.add_child(ValueHBox)
+					
+	x_spinbox.connect("value_changed", self, "text_update_x")
+	y_spinbox.connect("value_changed", self, "text_update_y")
+
+##############################################################
+##############################################################
+##############################################################
+
 func delete_children(node):
 	var children = node.get_children()
 	for child in children:
@@ -492,4 +540,8 @@ func _on_DebugLine_pressed():
 			var _line = Parser._parse_line(params)
 			if  _line.valid:
 				add_debug_line_hbox(_line.x1, _line.y1, _line.x2, _line.y2)#, _line.w)
+		elif func_name == "text":
+			var _text = Parser._parse_text(line)
+			if  _text.valid:
+				add_debug_text_hbox(_text.x, _text.y)
 		break		

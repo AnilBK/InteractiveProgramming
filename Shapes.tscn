@@ -33,6 +33,7 @@ margin_top = 49.0
 margin_right = 455.0
 margin_bottom = 458.0
 text = "circle 10 20 3
+text 20 25 \"Hello World\"
 "
 
 [node name="StackDecomposeVbox" type="VBoxContainer" parent="."]
