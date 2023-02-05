@@ -179,9 +179,57 @@ func update_initial_code(line_no, new_text):
 	$Program.set_line(line_no, new_text)
 	$Program.update()		
 
-func get_parameters(line):
+#If a line has no string, then bypass all the
+#complicated logic to split string, as we can do the job directly.
+func _no_string_split(line : String):
 	var params = line.rstrip(" ").split(" ")
 	return params
+
+func _string_split(line : String):
+	# TESTS for this function:
+	# All this examples work for this.
+	#	_string_split("Hello    World")
+	#	_string_split("Hello  World")
+	#	_string_split("10 20 Hello World")
+	#	_string_split("Hello \"Hello World")
+	#	_string_split("Hello \"Hello World\"")
+	
+	#Maybe use things like string.left(), get_slice() etc ??
+	
+	var params = []
+
+	#text "hello world " 23
+
+	var inside_quotes = false
+	var temp_param = ""
+	
+	for ch in line:
+		if (not inside_quotes) and (ch == " "):
+			#If there are two space in a row,
+			#then it is appended to the array.
+			if temp_param != "":
+				params.append(temp_param)
+			#temp_param can now store another param.
+			temp_param = ""
+		elif ch == "\"":
+			inside_quotes = not inside_quotes
+		else:			
+			temp_param += ch
+	
+	#In This Case, text 20 25 "Hello World"
+	#There is no space in the last for line string to split.
+	#So, perform that now.
+	if temp_param != "":
+		params.append(temp_param)
+
+	return params	
+	
+func get_parameters(line : String):
+	var line_contains_string = "\"" in line
+	if line_contains_string:
+		return _string_split(line)
+	else:
+		return _no_string_split(line)
 
 func update_param(param_to_modify, new_value):
 	#As of now, we directly access the current line,
