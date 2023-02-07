@@ -32,7 +32,9 @@ text = "Enter Program:"
 margin_top = 49.0
 margin_right = 455.0
 margin_bottom = 458.0
-text = "circle 10 20 3
+text = "# This is a comment,
+# but any line without unrecognized command works as a comment.
+circle 10 20 3
 text 20 25 \"Hello World\"
 "
 

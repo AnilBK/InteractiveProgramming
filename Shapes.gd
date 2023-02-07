@@ -62,7 +62,6 @@ func process_code():
 	
 	for line in lines:
 		code.append(line)
-		#print(line)
 
 func replace_nth_word(string : String, index, new_value):
 	var strings_splitted = string.split(" ")
@@ -97,6 +96,11 @@ func _draw():
 	for line in code:
 #		print(c)
 		line = line.strip_edges()
+
+		# Comment line.
+		if line.begins_with("#"):
+			continue
+
 		var params = get_parameters(line)
 		var func_name = params[0]
 		
