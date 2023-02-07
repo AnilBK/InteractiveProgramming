@@ -1,6 +1,10 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://Shapes.gd" type="Script" id=1]
+[ext_resource path="res://RobotoMono-Regular.ttf" type="DynamicFontData" id=2]
+
+[sub_resource type="DynamicFont" id=1]
+font_data = ExtResource( 2 )
 
 [node name="Shapes" type="Control"]
 script = ExtResource( 1 )
@@ -32,8 +36,10 @@ text = "Enter Program:"
 margin_top = 49.0
 margin_right = 455.0
 margin_bottom = 458.0
+custom_fonts/font = SubResource( 1 )
 text = "# This is a comment,
-# but any line without unrecognized command works as a comment.
+# but any line without unrecognized command
+# works as a comment.
 circle 10 20 3
 text 20 25 \"Hello World\"
 "

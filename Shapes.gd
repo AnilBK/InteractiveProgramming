@@ -68,7 +68,20 @@ func replace_nth_word(string : String, index, new_value):
 	strings_splitted[index] = str(new_value)
 	var final_str = String(" ").join(strings_splitted)
 	return final_str
-	
+
+func add_syntax_highlighting():
+	program_node.syntax_highlighting = true
+
+	#Register built in keywords.
+	for type in built_in_types:
+		var keyword = type.name
+		program_node.add_keyword_color(keyword, Color("ff7085"))
+
+	#Strings.	
+	program_node.add_color_region("\"", "\"", Color("ffeca1"))
+	#Comments.
+	program_node.add_color_region("#", "", Color("80c1cdd0"), true)
+
 func _ready():
 	font.font_data = load("res://Alaska.ttf")
 	font.size = 28
@@ -76,7 +89,9 @@ func _ready():
 	$HBoxContainer/Generate.visible = not live
 	
 	_on_Program_text_changed()
-		
+
+	add_syntax_highlighting()
+
 func _input(_event):
 	if Input.is_action_just_pressed("insert_mouse_position"):
 		var l_pos = local_pos(get_global_mouse_position())
