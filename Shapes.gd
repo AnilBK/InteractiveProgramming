@@ -96,6 +96,7 @@ func _process(_delta):
 func _draw():
 	for line in code:
 #		print(c)
+		line = line.strip_edges()
 		var params = get_parameters(line)
 		var func_name = params[0]
 		
@@ -184,7 +185,7 @@ func update_initial_code(line_no, new_text):
 #If a line has no string, then bypass all the
 #complicated logic to split string, as we can do the job directly.
 func _no_string_split(line : String):
-	var params = line.rstrip(" ").split(" ")
+	var params = line.split(" ")
 	return params
 
 func _string_split(line : String):
@@ -227,6 +228,7 @@ func _string_split(line : String):
 	return params	
 	
 func get_parameters(line : String):
+	line = line.strip_edges()
 	var line_contains_string = "\"" in line
 	if line_contains_string:
 		return _string_split(line)
@@ -236,7 +238,7 @@ func get_parameters(line : String):
 func update_param(param_to_modify, new_value):
 	#As of now, we directly access the current line,
 	#so we don't need to pass the line no.
-	var line = code[current_line()]
+	var line = code[current_line()].strip_edges()
 	#Line  =     circle	  	10 	20 	5
 	#params =    funcname 	x  	y   radius	
 	var params = get_parameters(line)
@@ -384,6 +386,8 @@ func _on_DebugLine_pressed():
 			c += 1
 			continue
 			
+		line = line.strip_edges()
+
 		var params = get_parameters(line)
 		var func_name = params[0]
 		
