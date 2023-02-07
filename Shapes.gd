@@ -7,6 +7,8 @@ var start_pos = Vector2(origin_x, origin_y)
 var live = false
 var should_update = false
 
+var currently_debugged_line = -1
+
 onready var debug_line_parent = $StackDecomposeVbox/DebugLineStack
 onready var program_node : TextEdit = $Program
 const Parser = preload("Parser.gd")
@@ -103,6 +105,13 @@ func _process(_delta):
 	var l_pos = str(local_pos(m_pos))
 #	$HBoxContainer/Label.text = str(m_pos) + " local pos: " + l_pos
 	$HBoxContainer/Label.text = "local pos: " + l_pos
+
+	var curr_line = current_line()
+	if curr_line != currently_debugged_line:
+		# That means line numbers have changed.
+		# If we were debugging another line, then remove those debug symbols.
+		delete_children(debug_line_parent)
+		currently_debugged_line = curr_line
 	
 	if live or should_update:
 		update()
