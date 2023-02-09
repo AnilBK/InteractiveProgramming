@@ -17,21 +17,21 @@ margin_right = 94.0
 margin_bottom = 40.0
 
 [node name="Generate" type="Button" parent="HBoxContainer"]
-margin_right = 71.0
+margin_right = 62.0
 margin_bottom = 40.0
-text = "Generate"
+text = "Execute"
 
 [node name="Live" type="CheckButton" parent="HBoxContainer"]
-margin_left = 75.0
-margin_right = 181.0
+margin_left = 66.0
+margin_right = 172.0
 margin_bottom = 40.0
 pressed = true
 text = "Live"
 
 [node name="Label" type="Label" parent="HBoxContainer"]
-margin_left = 185.0
+margin_left = 176.0
 margin_top = 13.0
-margin_right = 279.0
+margin_right = 270.0
 margin_bottom = 27.0
 text = "Enter Program:"
 
@@ -43,8 +43,14 @@ custom_fonts/font = SubResource( 1 )
 text = "# This is a comment,
 # but any line without unrecognized command
 # works as a comment.
+
+# Built in Functions as of now:
 circle 10 20 3
 text 20 25 \"Hello World\"
+line 20 40 50 60
+rect 50 60 20 40
+
+
 "
 
 [node name="StackDecomposeVbox" type="VBoxContainer" parent="."]
