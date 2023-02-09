@@ -20,7 +20,8 @@ var built_in_types = [
 	"name" : "circle",
 	"x" : 1,
 	"y" : 2,
-	"rad" : 3
+	"rad" : 3,
+	"color[OPTIONAL]" : 4
 },
 {
 	"name" : "rect",
@@ -134,9 +135,10 @@ func _draw():
 				var _x = parsed_circle.x
 				var _y = parsed_circle.y
 				var _rad = parsed_circle.rad
+				var _col = parsed_circle.color
 			
 				var pos = global_pos(Vector2(_x, _y))
-				draw_circle(pos, _rad, Color.red)
+				draw_circle(pos, _rad, _col)
 		elif func_name == "rect":
 			var parsed_rect = Parser._parse_rect(params)
 			if parsed_rect.valid:

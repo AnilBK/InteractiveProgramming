@@ -73,15 +73,16 @@ static func _parse_circle(params) -> Dictionary:
 	var x : float = 0.0
 	var y : float = 0.0
 	var rad : float = 0.0
+	var color : Color = Color(255, 255, 255)
 		
-	if params.size() != 4:
+	if params.size() != 4 and params.size() != 5:
 		valid = false
 	else:
 		x = float(params[1])
 		y = float(params[2])
 		rad = float(params[3])
 				
-	return {"valid" : valid, "x" : x, "y" : y, "rad" : rad}
+	return {"valid" : valid, "x" : x, "y" : y, "rad" : rad, "color" : color}
 
 	
 static func _parse_rect(params) -> Dictionary:
