@@ -56,11 +56,16 @@ static func _string_split(line : String):
 #   text 10 20 \"Hello World\" -> [text, 10, 20, Hello World]
 static func parse_line(line : String):
 	line = line.strip_edges()
+	var contents = []	
+
 	var line_contains_string = "\"" in line
 	if line_contains_string:
-		return _string_split(line)
+		contents = _string_split(line)
 	else:
-		return _no_string_split(line)
+		contents = _no_string_split(line)
+
+
+	return contents	
 
 ##############################################################
 ##############################################################
