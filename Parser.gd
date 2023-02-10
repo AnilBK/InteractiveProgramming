@@ -1,54 +1,5 @@
 extends Node
 
-# Our function parameters are separated by a space.
-# If there are no strings in a function then we can just split the string,
-# to get the parameters directly.	
-# For functions like:
-#	 line 10 20 40 50
-static func _no_string_split(line : String):
-	var params = line.split(" ")
-	return params
-
-# For functions like # text 10 20 "hello world"
-# single space based splitting doesn't work, as there can be spaces
-# in between strings.
-static func _string_split(line : String):
-	# TESTS for this function:
-	# All this examples work for this.
-	#	_string_split("Hello    World")
-	#	_string_split("Hello  World")
-	#	_string_split("10 20 Hello World")
-	#	_string_split("Hello \"Hello World")
-	#	_string_split("Hello \"Hello World\"")
-	
-	#Maybe use things like string.left(), get_slice() etc ??
-	
-	var params = []
-
-	var inside_quotes = false
-	var temp_param = ""
-	
-	for ch in line:
-		if (not inside_quotes) and (ch == " "):
-			#If there are two space in a row,
-			#then it is appended to the array.
-			if temp_param != "":
-				params.append(temp_param)
-			#temp_param can now store another param.
-			temp_param = ""
-		elif ch == "\"":
-			inside_quotes = not inside_quotes
-		else:			
-			temp_param += ch
-	
-	#In This Case, text 20 25 "Hello World"\n
-	#There is no space in the last for line string to split.
-	#So, perform that now.
-	if temp_param != "":
-		params.append(temp_param)
-
-	return params	
-
 static func parse_color(line : String):
 	var valid : bool = true
 	var color : Color = Color(255, 255, 255)
@@ -78,36 +29,6 @@ static func parse_color(line : String):
 	return {"valid" : valid, "color" : color, "start" : color_start, "len" : color_len,
 			"colors_str" : colors_str}	
 
-# Returns the function name and parameters.
-# For eg:
-# 	line 10 20 40 50 -> [line, 10, 20, 40, 50]
-#   text 10 20 \"Hello World\" -> [text, 10, 20, Hello World]
-static func parse_line(line : String):
-	line = line.strip_edges()
-
-	# Get the color directly from a string,
-	# Just Hacky Workaround, because this parser is really bad.
-	# that means we don't really care where this color function is called in a line,
-	# we just directly parse it immediately.
-	var parsed_color = parse_color(line)
-	if parsed_color.valid:
-		#temporarily remove the color from string,
-		#so we shouldn't parse in the next steps below.
-		line.erase(parsed_color.start, parsed_color.len)
-		line = line.strip_edges(false, true)
-
-	var contents = []	
-
-	var line_contains_string = "\"" in line
-	if line_contains_string:
-		contents = _string_split(line)
-	else:
-		contents = _no_string_split(line)
-
-	if parsed_color.valid:
-		contents.append(parsed_color.colors_str)	
-
-	return contents	
 
 ##############################################################
 ##############################################################
@@ -120,14 +41,16 @@ static func _parse_circle(params) -> Dictionary:
 	var x : float = 0.0
 	var y : float = 0.0
 	var rad : float = 0.0
-	var _color : Color = Color(255, 255, 255)
+	var _color : Color = Color.white
 
-	var line = String(" ").join(params)
-	var parsed_color = parse_color(line)
-	if parsed_color.valid:
-		_color = parsed_color.color
-		
-	if params.size() < 4:
+	if params.size() == 5:
+		# 5th means color.
+		var col_str = params[4]
+		var parsed_color = parse_color(col_str)
+		if parsed_color.valid:
+			_color = parsed_color.color
+
+	if not(params.size() != 4 or params.size() != 5):
 		valid = false
 	else:
 		x = float(params[1])
@@ -145,8 +68,16 @@ static func _parse_rect(params) -> Dictionary:
 	var y : float = 0.0
 	var w : float = 0.0
 	var h : float = 0.0
+	var _color : Color = Color.white
+
+	if params.size() == 6:
+		# 6th means color.
+		var col_str = params[5]
+		var parsed_color = parse_color(col_str)
+		if parsed_color.valid:
+			_color = parsed_color.color
 		
-	if params.size() != 5:
+	if not(params.size() != 5 or params.size() != 6):
 		valid = false
 	else:
 		x = float(params[1])
@@ -154,7 +85,7 @@ static func _parse_rect(params) -> Dictionary:
 		w = float(params[3])
 		h = float(params[4])
 				
-	return {"valid" : valid, "x" : x, "y" : y, "w" : w, "h" : h}
+	return {"valid" : valid, "x" : x, "y" : y, "w" : w, "h" : h, "color" : _color}
 
 
 static func _parse_line(params) -> Dictionary:
@@ -166,8 +97,16 @@ static func _parse_line(params) -> Dictionary:
 	var x2 : float = 0.0
 	var y2 : float = 0.0
 	var w : float = 1.0 #Optional
+	var _color : Color = Color.white
 		
-	#w is an additional param, so we check sizes 5 and 6.	
+	if params.size() == 6:
+		# 6th means color.
+		var col_str = params[5]
+		var parsed_color = parse_color(col_str)
+		if parsed_color.valid:
+			_color = parsed_color.color
+
+	#Color is an additional param, so we check sizes 5 and 6.	
 	if not (params.size() == 5 or params.size() == 6):
 		valid = false
 	else:
@@ -179,37 +118,33 @@ static func _parse_line(params) -> Dictionary:
 		if params.size() == 6:
 			w = float(params[5])
 				
-	return {"valid" : valid, "x1" : x1, "y1" : y1, "x2" : x2, "y2" : y2, "w" : w}
+	return {"valid" : valid, "x1" : x1, "y1" : y1, "x2" : x2, "y2" : y2, "w" : w, "color" : _color}
 
 		
-static func _parse_text(line : String) -> Dictionary:
+static func _parse_text(params) -> Dictionary:
 	#Line         =    text	  	10 	20 	" Some String "
 	#params       =   funcname 	x1	y1	" string      "	
 	var valid : bool = true
 	var x : float = 0.0
 	var y : float = 0.0
 	var string : String = ""
+	var _color : Color = Color.white
 
-	#Make sure we have just two quotes.
-	var quotes_count = line.count("\"")
-	if quotes_count == 2:
-		var pos_of_first_quote = line.find("\"")
-		#text	  	10 	20 	" Some String "
-		#                   ^ pos_of_first_quote 
-		#1 			2	3 = 3 parameters on the left.
-		var left_string = line.left(pos_of_first_quote)
-		left_string = left_string.rstrip(" ")
-
-		var left_params = left_string.split(" ")
-		if left_params.size() == 3:
-			x = float(left_params[1])
-			y = float(left_params[2])
-			string = line.get_slice("\"", 1)
-		else:	
-			valid = false
-	else:
-		valid = false
-
-	return {"valid" : valid, "x" : x, "y" : y, "string" : string}
+	if params.size() == 5:
+		# 5th means color.
+		var col_str = params[4]
+		var parsed_color = parse_color(col_str)
+		if parsed_color.valid:
+			_color = parsed_color.color
 		
+	if not(params.size() != 4 or params.size() != 5):
+		valid = false
+	else:
+		x = float(params[1])
+		y = float(params[2])
+		string = params[3]
+		string = string.lstrip("\"")
+		string = string.rstrip("\"")
+
+	return {"valid" : valid, "x" : x, "y" : y, "string" : string, "color" : _color}
 	

@@ -8,6 +8,16 @@
 
 config_version=4
 
+_global_script_classes=[ {
+"base": "Node",
+"class": "Lexer",
+"language": "GDScript",
+"path": "res://Lexer.gd"
+} ]
+_global_script_class_icons={
+"Lexer": ""
+}
+
 [application]
 
 config/name="Interactive Programming Project"

@@ -12,7 +12,9 @@ var currently_debugged_line = -1
 onready var debug_line_parent = $StackDecomposeVbox/DebugLineStack
 onready var program_node : TextEdit = $Program
 const Parser = preload("Parser.gd")
+const Lexer = preload("Lexer.gd")
 
+var lexer = Lexer.new()
 var font = DynamicFont.new()
 
 var built_in_types = [
@@ -91,9 +93,6 @@ func _ready():
 	live = $HBoxContainer/Live.pressed
 	$HBoxContainer/Generate.visible = not live
 
-	var str1 = "circle 10 20 40 Color(10,20,255)"
-	print(Parser.parse_color(str1))
-	
 	_on_Program_text_changed()
 
 	add_syntax_highlighting()
@@ -129,7 +128,11 @@ func _draw():
 		if line.begins_with("#"):
 			continue
 
-		var params = Parser.parse_line(line)
+		var params = lexer.all_tokens_from_line(line)
+
+		if params.empty():
+			continue
+
 		var func_name = params[0]
 		
 		if func_name == "circle":
@@ -149,12 +152,11 @@ func _draw():
 				var _y = parsed_rect.y 
 				var _w = parsed_rect.w 
 				var _h = parsed_rect.h
+				var _col = parsed_rect.color
 				
 				var pos = global_pos(Vector2(_x, _y))
 				var size = Vector2(_w, _h)
-
-				var color = Color.blue
-				draw_rect(Rect2(pos, size), color)
+				draw_rect(Rect2(pos, size), _col)
 		elif func_name == "line":
 			var parsed_line = Parser._parse_line(params)
 			if parsed_line.valid:
@@ -163,11 +165,11 @@ func _draw():
 				var _x2 = parsed_line.x2
 				var _y2 = parsed_line.y2
 				var _w = parsed_line.w
+				var _col = parsed_line.color
 				
 				var line_start_pos = global_pos(Vector2(_x1, _y1))
 				var line_end_pos = global_pos(Vector2(_x2, _y2))
 				
-				var color = Color.green
 
 				"""
 				if _w == 1.0f:
@@ -178,16 +180,17 @@ func _draw():
 					draw_line(line_start_pos, line_end_pos, color, _w)
 				"""		
 				#We can do the thing above but remove the extra if i guess.
-				draw_line(line_start_pos, line_end_pos, color, _w)
+				draw_line(line_start_pos, line_end_pos, _col, _w)
 		elif func_name == "text":
-			var parsed_text = Parser._parse_text(line)
+			var parsed_text = Parser._parse_text(params)
 			if parsed_text.valid:
 				var _x = parsed_text.x
 				var _y = parsed_text.y 
 				var _string = parsed_text.string
+				var _col = parsed_text.color
 
 				var pos = global_pos(Vector2(_x, _y))
-				draw_string(font, pos, _string)		
+				draw_string(font, pos, _string, _col)		
 			
 	#Draw Grid and Gizmos.
 	draw_circle(start_pos, 2, Color.red)
@@ -222,8 +225,7 @@ func update_param(param_to_modify, new_value):
 	var line = code[current_line()].strip_edges()
 	#Line  =     circle	  	10 	20 	5
 	#params =    funcname 	x  	y   radius	
-	var params = Parser.parse_line(line)
-
+	var params = lexer.all_tokens_from_line(line)
 	var func_name = params[0]
 
 	for shape in built_in_types:
@@ -369,7 +371,7 @@ func _on_DebugLine_pressed():
 			
 		line = line.strip_edges()
 
-		var params = Parser.parse_line(line)
+		var params = lexer.all_tokens_from_line(line)	
 		var func_name = params[0]
 		
 		if func_name == "circle":
@@ -385,7 +387,7 @@ func _on_DebugLine_pressed():
 			if  _line.valid:
 				add_debug_line_hbox(_line.x1, _line.y1, _line.x2, _line.y2)#, _line.w)
 		elif func_name == "text":
-			var _text = Parser._parse_text(line)
+			var _text = Parser._parse_text(params)
 			if  _text.valid:
 				add_debug_text_hbox(_text.x, _text.y)
 		break		
