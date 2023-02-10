@@ -45,7 +45,7 @@ text = "# This is a comment,
 # works as a comment.
 
 # Built in Functions as of now:
-circle 10 20 3
+circle 10 20 40 Color(10,20,255)
 text 20 25 \"Hello World\"
 line 20 40 50 60
 rect 50 60 20 40

@@ -49,6 +49,34 @@ static func _string_split(line : String):
 
 	return params	
 
+static func parse_color(line : String):
+	var valid : bool = true
+	var color : Color = Color(255, 255, 255)
+	var color_start : int = -1
+	var color_len : int = -1
+	var colors_str : String = ""
+
+	if "Color(" in line:
+		color_start = line.find("Color(")
+		var color_end = line.find(")", color_start)
+		if color_end == -1:
+			valid = false
+		else:
+			color_len = color_end - color_start + 1
+			colors_str = line.substr(color_start, color_len)
+			var colors_arr = colors_str.split(",")
+			if colors_arr.size() != 3:
+				valid = false
+			else:
+				var r = int(colors_arr[0])
+				var g = int(colors_arr[1])
+				var b = int(colors_arr[2])
+				color = Color8(r, g, b)		
+	else:
+		valid = false
+		
+	return {"valid" : valid, "color" : color, "start" : color_start, "len" : color_len,
+			"colors_str" : colors_str}	
 
 # Returns the function name and parameters.
 # For eg:
@@ -56,6 +84,18 @@ static func _string_split(line : String):
 #   text 10 20 \"Hello World\" -> [text, 10, 20, Hello World]
 static func parse_line(line : String):
 	line = line.strip_edges()
+
+	# Get the color directly from a string,
+	# Just Hacky Workaround, because this parser is really bad.
+	# that means we don't really care where this color function is called in a line,
+	# we just directly parse it immediately.
+	var parsed_color = parse_color(line)
+	if parsed_color.valid:
+		#temporarily remove the color from string,
+		#so we shouldn't parse in the next steps below.
+		line.erase(parsed_color.start, parsed_color.len)
+		line = line.strip_edges(false, true)
+
 	var contents = []	
 
 	var line_contains_string = "\"" in line
@@ -64,6 +104,8 @@ static func parse_line(line : String):
 	else:
 		contents = _no_string_split(line)
 
+	if parsed_color.valid:
+		contents.append(parsed_color.colors_str)	
 
 	return contents	
 
@@ -78,16 +120,21 @@ static func _parse_circle(params) -> Dictionary:
 	var x : float = 0.0
 	var y : float = 0.0
 	var rad : float = 0.0
-	var color : Color = Color(255, 255, 255)
+	var _color : Color = Color(255, 255, 255)
+
+	var line = String(" ").join(params)
+	var parsed_color = parse_color(line)
+	if parsed_color.valid:
+		_color = parsed_color.color
 		
-	if params.size() != 4 and params.size() != 5:
+	if params.size() < 4:
 		valid = false
 	else:
 		x = float(params[1])
 		y = float(params[2])
 		rad = float(params[3])
 				
-	return {"valid" : valid, "x" : x, "y" : y, "rad" : rad, "color" : color}
+	return {"valid" : valid, "x" : x, "y" : y, "rad" : rad, "color" : _color}
 
 	
 static func _parse_rect(params) -> Dictionary:

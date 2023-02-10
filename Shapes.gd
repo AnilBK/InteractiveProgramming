@@ -90,6 +90,9 @@ func _ready():
 	font.size = 28
 	live = $HBoxContainer/Live.pressed
 	$HBoxContainer/Generate.visible = not live
+
+	var str1 = "circle 10 20 40 Color(10,20,255)"
+	print(Parser.parse_color(str1))
 	
 	_on_Program_text_changed()
 
