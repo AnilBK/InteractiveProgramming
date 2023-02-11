@@ -27,124 +27,76 @@ static func parse_color(line : String):
 		valid = false
 		
 	return {"valid" : valid, "color" : color, "start" : color_start, "len" : color_len,
-			"colors_str" : colors_str}	
-
-
+			"colors_str" : colors_str}			
 ##############################################################
 ##############################################################
 ##############################################################
 
-static func _parse_circle(params) -> Dictionary:
-	#Line       =    circle	  	10 	20 	5
-	#params (4) =    funcname 	x  	y   radius	
-	var valid : bool = true
-	var x : float = 0.0
-	var y : float = 0.0
-	var rad : float = 0.0
-	var _color : Color = Color.white
+var built_in_types = {
+	"circle" : "x,y,rad,color[optional]",
+	"rect" : "x,y,w,h,color[optional]",
+	"line" : "x1,y1,x2,y2,color[optional]",
+	"text" : "x,y,string,color[optional]"
+}
 
-	if params.size() == 5:
-		# 5th means color.
-		var col_str = params[4]
-		var parsed_color = parse_color(col_str)
-		if parsed_color.valid:
-			_color = parsed_color.color
-
-	if not(params.size() != 4 or params.size() != 5):
-		valid = false
-	else:
-		x = float(params[1])
-		y = float(params[2])
-		rad = float(params[3])
-				
-	return {"valid" : valid, "x" : x, "y" : y, "rad" : rad, "color" : _color}
-
+func _parse_shape(p_params) -> Dictionary:
+	# p_params : [circle, 10, 20, 40, Color(10,20,255)]
+	#             ^^^^^^ shape_name
+	var shape_name = p_params[0]
+	# "x,y,rad,color[optional]"
+	# ^^^^^^^^^^^^^^^^^^^^^^^^ params_required
+	var params_required = built_in_types[shape_name]
+	var params = params_required.split(",")
 	
-static func _parse_rect(params) -> Dictionary:
-	#Line       =    rect	  	10 	20 	30	40
-	#params (5) =    funcname 	x	y	w	h	
-	var valid : bool = true
-	var x : float = 0.0
-	var y : float = 0.0
-	var w : float = 0.0
-	var h : float = 0.0
-	var _color : Color = Color.white
+	var required : int = 0
+	var optional : int = 0
 
-	if params.size() == 6:
-		# 6th means color.
-		var col_str = params[5]
-		var parsed_color = parse_color(col_str)
-		if parsed_color.valid:
-			_color = parsed_color.color
-		
-	if not(params.size() != 5 or params.size() != 6):
-		valid = false
-	else:
-		x = float(params[1])
-		y = float(params[2])
-		w = float(params[3])
-		h = float(params[4])
+	var valid : bool = true
+	var result = {"valid" : valid}
+
+	# Default Initialize all the expected parameters.
+	for param in params:
+		if "[optional]" in param:
+			optional += 1
+			param = param.rstrip("[optional]")
+
+		if param == "color":
+			result[param] = Color.white
+		elif param == "string":
+			result[param] = ""
+		else:
+			# All others are float as of now.	
+			result[param] = 0.0
+
+	required = params.size() - optional
+
+	# 1 is func name, so remove that		
+	if (p_params.size() - 1 == required or p_params.size() - 1 == params.size()):
+		var c : int = 1
+		# p_params[0] is func name,
+		# and actual parameters begin from 1.
+		for param in params:
+			if c >= p_params.size():
+				break
+
+			if "[optional]" in param:
+				param = param.rstrip("[optional]")
 				
-	return {"valid" : valid, "x" : x, "y" : y, "w" : w, "h" : h, "color" : _color}
-
-
-static func _parse_line(params) -> Dictionary:
-	#Line       =    line	  	10 	20 	30	40
-	#params (5) =    funcname 	x1	y1	x2	y2	
-	var valid : bool = true
-	var x1 : float = 0.0
-	var y1 : float = 0.0
-	var x2 : float = 0.0
-	var y2 : float = 0.0
-	var w : float = 1.0 #Optional
-	var _color : Color = Color.white
-		
-	if params.size() == 6:
-		# 6th means color.
-		var col_str = params[5]
-		var parsed_color = parse_color(col_str)
-		if parsed_color.valid:
-			_color = parsed_color.color
-
-	#Color is an additional param, so we check sizes 5 and 6.	
-	if not (params.size() == 5 or params.size() == 6):
-		valid = false
+			if param == "color":
+				var parsed_color = parse_color(p_params[c])
+				if parsed_color.valid:
+					result[param] = parsed_color.color
+			elif param == "string":
+				var string = p_params[c]
+				string = string.lstrip("\"")
+				string = string.rstrip("\"")
+				result[param] = string
+			else:	
+				result[param] = float(p_params[c])
+			c += 1 
 	else:
-		x1 = float(params[1])
-		y1 = float(params[2])
-		x2 = float(params[3])
-		y2 = float(params[4])
-
-		if params.size() == 6:
-			w = float(params[5])
-				
-	return {"valid" : valid, "x1" : x1, "y1" : y1, "x2" : x2, "y2" : y2, "w" : w, "color" : _color}
-
-		
-static func _parse_text(params) -> Dictionary:
-	#Line         =    text	  	10 	20 	" Some String "
-	#params       =   funcname 	x1	y1	" string      "	
-	var valid : bool = true
-	var x : float = 0.0
-	var y : float = 0.0
-	var string : String = ""
-	var _color : Color = Color.white
-
-	if params.size() == 5:
-		# 5th means color.
-		var col_str = params[4]
-		var parsed_color = parse_color(col_str)
-		if parsed_color.valid:
-			_color = parsed_color.color
-		
-	if not(params.size() != 4 or params.size() != 5):
 		valid = false
-	else:
-		x = float(params[1])
-		y = float(params[2])
-		string = params[3]
-		string = string.lstrip("\"")
-		string = string.rstrip("\"")
 
-	return {"valid" : valid, "x" : x, "y" : y, "string" : string, "color" : _color}
-	
+	result["valid"] = valid	
+	return result				
+

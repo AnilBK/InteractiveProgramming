@@ -14,37 +14,9 @@ onready var program_node : TextEdit = $Program
 const Parser = preload("Parser.gd")
 const Lexer = preload("Lexer.gd")
 
+var parser = Parser.new()
 var lexer = Lexer.new()
 var font = DynamicFont.new()
-
-var built_in_types = [
-{
-	"name" : "circle",
-	"x" : 1,
-	"y" : 2,
-	"rad" : 3,
-	"color[OPTIONAL]" : 4
-},
-{
-	"name" : "rect",
-	"x" : 1,
-	"y" : 2,
-	"w" : 3,
-	"h" : 4
-},
-{
-	"name" : "line",
-	"x1" : 1,
-	"y1" : 2,
-	"x2" : 3,
-	"y2" : 4
-},
-{
-	"name" : "text",
-	"x" : 1,
-	"y" : 2
-}
-]
 
 var code = [
 	"circle 10 20 5"
@@ -78,8 +50,7 @@ func add_syntax_highlighting():
 	program_node.syntax_highlighting = true
 
 	#Register built in keywords.
-	for type in built_in_types:
-		var keyword = type.name
+	for keyword in parser.built_in_types.keys():
 		program_node.add_keyword_color(keyword, Color("ff7085"))
 
 	#Strings.	
@@ -121,7 +92,6 @@ func _process(_delta):
 
 func _draw():
 	for line in code:
-#		print(c)
 		line = line.strip_edges()
 
 		# Comment line.
@@ -129,14 +99,13 @@ func _draw():
 			continue
 
 		var params = lexer.all_tokens_from_line(line)
-
 		if params.empty():
 			continue
 
 		var func_name = params[0]
 		
 		if func_name == "circle":
-			var parsed_circle = Parser._parse_circle(params)
+			var parsed_circle = parser._parse_shape(params)
 			if parsed_circle.valid:
 				var _x = parsed_circle.x
 				var _y = parsed_circle.y
@@ -146,7 +115,7 @@ func _draw():
 				var pos = global_pos(Vector2(_x, _y))
 				draw_circle(pos, _rad, _col)
 		elif func_name == "rect":
-			var parsed_rect = Parser._parse_rect(params)
+			var parsed_rect = parser._parse_shape(params)
 			if parsed_rect.valid:
 				var _x = parsed_rect.x
 				var _y = parsed_rect.y 
@@ -158,13 +127,13 @@ func _draw():
 				var size = Vector2(_w, _h)
 				draw_rect(Rect2(pos, size), _col)
 		elif func_name == "line":
-			var parsed_line = Parser._parse_line(params)
+			var parsed_line = parser._parse_shape(params)
 			if parsed_line.valid:
 				var _x1 = parsed_line.x1
 				var _y1 = parsed_line.y1
 				var _x2 = parsed_line.x2
 				var _y2 = parsed_line.y2
-				var _w = parsed_line.w
+				var _w = 1.0#parsed_line.w
 				var _col = parsed_line.color
 				
 				var line_start_pos = global_pos(Vector2(_x1, _y1))
@@ -182,7 +151,7 @@ func _draw():
 				#We can do the thing above but remove the extra if i guess.
 				draw_line(line_start_pos, line_end_pos, _col, _w)
 		elif func_name == "text":
-			var parsed_text = Parser._parse_text(params)
+			var parsed_text = parser._parse_shape(params)
 			if parsed_text.valid:
 				var _x = parsed_text.x
 				var _y = parsed_text.y 
@@ -228,17 +197,33 @@ func update_param(param_to_modify, new_value):
 	var params = lexer.all_tokens_from_line(line)
 	var func_name = params[0]
 
-	for shape in built_in_types:
-		if func_name == shape.name:
-			if true or params.size() == shape.size():#Maybe not this check required ??
-				if param_to_modify in shape.keys():	
-					# circle x y rad
-					#	"x" : 1 -> From built_in_types.
-					# Means we have to replace the 1th word after a space, whenever we have to modify the "x" value.
-					var index = shape.get(param_to_modify)
-					var modified_line = replace_nth_word(line, index, new_value)
-					update_initial_code(current_line(), modified_line)
-					return
+	# built_in_types : "circle" : "x,y,rad,color[optional]"
+	#  			   ^^^^^^  built_in_func_name		
+	for built_in_func_name in parser.built_in_types.keys():
+		if func_name == built_in_func_name:
+			# "circle" : "x,y,rad,color[optional]"
+			#            ^^^^^^^^^^^^^^^^^^^^^^^^ params_str
+			var params_str = parser.built_in_types.get(built_in_func_name)
+			# [x, y, rad, color[optional]]
+			# ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ params_list
+			var params_list : PoolStringArray = params_str.split(",")
+			#	"circle" : "x,y,rad,color[optional]"
+			#               ^ index = 0 
+			var index = params_list.find(param_to_modify)
+				
+			if index != -1:
+				# Circle x y rad.
+				#        ^ index = 1
+				#
+				# So, if we want to modify x in the given line,
+				#
+				# we have to modify the 2nd word in the line.
+				# Since, params_list doesn't include the function name itself.
+				# So, we add +1 to index.
+				var modified_line = replace_nth_word(line, index + 1, new_value)
+				update_initial_code(current_line(), modified_line)
+				return
+	
 
 ##############################################################
 ##############################################################
@@ -372,22 +357,25 @@ func _on_DebugLine_pressed():
 		line = line.strip_edges()
 
 		var params = lexer.all_tokens_from_line(line)	
+		if params.empty():
+			continue
+
 		var func_name = params[0]
 		
 		if func_name == "circle":
-			var circle = Parser._parse_circle(params)
+			var circle = parser._parse_shape(params)
 			if circle.valid:
 				add_debug_circle_hbox(circle.x, circle.y, circle.rad)
 		elif func_name == "rect":
-			var _rect = Parser._parse_rect(params)
+			var _rect = parser._parse_shape(params)
 			if  _rect.valid:
 				add_debug_rect_hbox(_rect.x, _rect.y, _rect.w, _rect.h)
 		elif func_name == "line":
-			var _line = Parser._parse_line(params)
+			var _line = parser._parse_shape(params)
 			if  _line.valid:
 				add_debug_line_hbox(_line.x1, _line.y1, _line.x2, _line.y2)#, _line.w)
 		elif func_name == "text":
-			var _text = Parser._parse_text(params)
+			var _text = parser._parse_shape(params)
 			if  _text.valid:
 				add_debug_text_hbox(_text.x, _text.y)
 		break		
