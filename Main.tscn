@@ -40,18 +40,65 @@ margin_top = 49.0
 margin_right = 455.0
 margin_bottom = 458.0
 custom_fonts/font = SubResource( 1 )
-text = "# This is a comment,
-# but any line without unrecognized command
+text = "# Tool that lets you see output while coding.
+# Debug Variables with sliders.
+# Scroll to the Bottom For Documentation:
+
+# The LolyPop.
+rect 389 426 154 20 Color(130, 100, 71)
+rect 461 291 5 135
+circle 465 291 25 Color(255, 49, 148)
+text 409 476 \"LolyPop\"
+
+# The Character:
+# The face:
+rect 42 230 200 100 Color(172,202,103)
+# The eyes:
+circle 82 266 10 Color(114,67,36)
+circle 192 266 10 Color(114,67,36)
+# The Mouth:
+line 78 302 199 303 Color(119,81,51)
+
+# The Legs.
+rect 80 330 20 100 Color(249, 205, 133)
+rect 202 330 20 100 Color(249, 205, 133)
+# The Shoes.
+rect 50 430 50 15 Color(136, 161, 71)
+rect 172 430 50 15 Color(136, 161, 71)
+
+# Hands.
+line 42 287 5 320 Color(251,206,137)
+line 242 287 279 320 Color(251,206,137)
+
+text 84 111 \"That's a small lolypop :(\"
+text 84 148 \"Click on line no 8 and press Debug Line\".
+text 84 188 \"Hold and drag the sliders right to Radius.\"
+
+#####################################################################
+#####################################################################
+#####################################################################
+
+# The Documentation:
+
+# This is a comment,
+# but any line with unrecognized command
 # works as a comment.
 
 # Built in Functions as of now:
-circle 10 20 40 Color(10,20,255)
-text 20 25 \"Hello World\"
-line 20 40 50 60
-rect 50 60 20 40
+# circle x y radius
+# rect x y width height
+# line x1 y1 x2 y2
+# text x y \"Some Text Inside\"
 
+# All these functions can,
+#   take an optional Color(r,g,b).
+# circle x y radius Color(r, g, b)
 
-"
+# Middle Click to Insert Current Mouse Position at Cursor Location.
+
+# A Project By : Anil BK
+# Source Code  : https://github.com/AnilBK/InteractiveProgramming/"
+show_line_numbers = true
 
 [node name="StackDecomposeVbox" type="VBoxContainer" parent="."]
 margin_top = 477.0

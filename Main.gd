@@ -77,8 +77,7 @@ func _input(_event):
 func _process(_delta):
 	var m_pos = get_global_mouse_position()
 	var l_pos = str(local_pos(m_pos))
-#	$HBoxContainer/Label.text = str(m_pos) + " local pos: " + l_pos
-	$HBoxContainer/Label.text = "local pos: " + l_pos
+	$HBoxContainer/Label.text = "Mouse pos: " + l_pos
 
 	var curr_line = current_line()
 	if curr_line != currently_debugged_line:
