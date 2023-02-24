@@ -92,7 +92,12 @@ func _parse_shape(p_params) -> Dictionary:
 				string = string.rstrip("\"")
 				result[param] = string
 			else:	
-				result[param] = float(p_params[c])
+				var var_data = VariablesSingleton.get_variables_if_exits(p_params[c])
+				var var_exits = var_data[0]
+				if var_exits:
+					result[param] = float(var_data[1])
+				else:	
+					result[param] = float(p_params[c])
 			c += 1 
 	else:
 		valid = false

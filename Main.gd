@@ -1,6 +1,6 @@
-extends Control
+extends Panel
 
-var origin_x = 490
+var origin_x = 520
 var origin_y = 20
 var start_pos = Vector2(origin_x, origin_y)
 
@@ -9,10 +9,17 @@ var should_update = false
 
 var currently_debugged_line = -1
 
-onready var debug_line_parent = $StackDecomposeVbox/DebugLineStack
-onready var program_node : TextEdit = $Program
+onready var debug_line_parent = $MainVbox/MainSourceCodeSection/DebugLineHbox/DebugLineContainer
+onready var debug_variables_parent = $MainVbox/VariablesSection/DebugVariablesContainer
+
+onready var program_node : TextEdit = $MainVbox/MainSourceCodeSection/MainSourceHBox/MainProgramTextEdit
 const Parser = preload("Parser.gd")
 const Lexer = preload("Lexer.gd")
+
+onready var live_btn_node : CheckButton = $MainVbox/TopBar/Live
+onready var generate_btn_node : Button = $MainVbox/TopBar/Execute
+onready var debug_variables_textedit : TextEdit = $MainVbox/VariablesSection/Variables/TextEdit
+onready var mouse_pos_label : Label = $MainVbox/TopBar/MousePosLabel
 
 var parser = Parser.new()
 var lexer = Lexer.new()
@@ -61,12 +68,21 @@ func add_syntax_highlighting():
 func _ready():
 	font.font_data = load("res://Alaska.ttf")
 	font.size = 28
-	live = $HBoxContainer/Live.pressed
-	$HBoxContainer/Generate.visible = not live
-
-	_on_Program_text_changed()
+	live = live_btn_node.pressed
+	generate_btn_node.visible = not live
 
 	add_syntax_highlighting()
+
+	var line = "rect x y 20 30"
+	var params = lexer.all_tokens_from_line(line)
+	print(params)
+	print("Memory:")
+	print(VariablesSingleton.variables)
+	print("--------------------------------")
+	_on_UpdateVariables_pressed()
+	
+	
+	_on_MainProgramTextEdit_text_changed()
 
 func _input(_event):
 	if Input.is_action_just_pressed("insert_mouse_position"):
@@ -77,7 +93,7 @@ func _input(_event):
 func _process(_delta):
 	var m_pos = get_global_mouse_position()
 	var l_pos = str(local_pos(m_pos))
-	$HBoxContainer/Label.text = "Mouse pos: " + l_pos
+	mouse_pos_label.text = "Mouse pos: " + l_pos
 
 	var curr_line = current_line()
 	if curr_line != currently_debugged_line:
@@ -167,15 +183,16 @@ func _draw():
 
 	should_update = false		
 
-func _on_Generate_pressed():
+
+func _on_Execute_pressed():
 	should_update = true
 	process_code()
 
 func _on_Live_toggled(button_pressed):
 	live = button_pressed	
-	$HBoxContainer/Generate.visible = not button_pressed
+	generate_btn_node.visible = not button_pressed
 
-func _on_Program_text_changed():
+func _on_MainProgramTextEdit_text_changed():
 	if live:
 		process_code()
 
@@ -183,8 +200,8 @@ func update_initial_code(line_no, new_text):
 #	code[0] = modified_line + "\n"
 #	print(modified_line + "\n")
 	should_update = true
-	$Program.set_line(line_no, new_text)
-	$Program.update()		
+	program_node.set_line(line_no, new_text)
+	program_node.update()		
 
 
 func update_param(param_to_modify, new_value):
@@ -341,8 +358,8 @@ func delete_children(node):
 	var children = node.get_children()
 	for child in children:
 		node.remove_child(child)
-		
-func _on_DebugLine_pressed():
+
+func _on_MainSource_DebugLine_pressed():
 	#Clear all childrens.
 	delete_children(debug_line_parent)
 	
@@ -378,3 +395,55 @@ func _on_DebugLine_pressed():
 			if  _text.valid:
 				add_debug_text_hbox(_text.x, _text.y)
 		break		
+
+
+func register_variables(var_name, var_value):
+	VariablesSingleton.variables[var_name] = var_value
+
+func update_current_line_variable(new_value):
+	var line_no = debug_variables_textedit.cursor_get_line()
+	var line = debug_variables_textedit.get_line(line_no)
+	
+	var params = lexer.all_tokens_from_line(line)
+	if params.size() == 3:
+		if params[1] == "=":
+			var var_name = params[0]
+			var modified_line = var_name + " = " + str(new_value)
+			debug_variables_textedit.set_line(line_no, modified_line)
+			debug_variables_textedit.update()
+			_on_UpdateVariables_pressed()
+
+func add_debug_variables_hbox(label, value):
+	var ValueHBox = HBoxContainer.new()
+	add_number_debug(ValueHBox, label, int(value), "update_current_line_variable")
+
+	debug_variables_parent.add_child(ValueHBox)	
+
+func _on_UpdateVariables_pressed():
+	var variables_str = debug_variables_textedit.text
+	var lines = variables_str.split("\n")
+	for line in lines:
+		var params = lexer.all_tokens_from_line(line)
+		print(params)
+		
+		# x			  =	 10
+		# ^var_name 	 ^var_value
+		if params.size() == 3:
+			if params[1] == "=":
+				var var_name = params[0]
+				var var_value = params[2]
+				register_variables(var_name, var_value)
+		
+
+func _on_DebugVariables_pressed():
+		delete_children(debug_variables_parent)
+		
+		var line_no = debug_variables_textedit.cursor_get_line()
+		var line = debug_variables_textedit.get_line(line_no)
+		
+		var params = lexer.all_tokens_from_line(line)
+		if params.size() == 3:
+			if params[1] == "=":
+				var var_name = params[0]
+				var var_value = params[2]
+				add_debug_variables_hbox(var_name + " : ", var_value)

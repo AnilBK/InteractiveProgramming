@@ -24,6 +24,10 @@ config/name="Interactive Programming Project"
 run/main_scene="res://Main.tscn"
 config/icon="res://icon.png"
 
+[autoload]
+
+VariablesSingleton="*res://VariablesSingleton.gd"
+
 [input]
 
 insert_mouse_position={
